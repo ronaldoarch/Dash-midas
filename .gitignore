@@ -1,0 +1,8 @@
+__pycache__/
+*.pyc
+instance/
+venv/
+.env
+credentials.json
+backup_dash_midas/
+.DS_Store 

@@ -1,0 +1,16 @@
+{
+    "clientes": [
+        {
+            "name": "Loja Exemplo",
+            "id": "001",
+            "industry": "Varejo",
+            "active": true
+        },
+        {
+            "name": "Startup Tech",
+            "id": "002",
+            "industry": "Tecnologia",
+            "active": false
+        }
+    ]
+}

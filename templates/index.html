@@ -1,0 +1,131 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard Publicitário</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+</head>
+<body>
+  <h1>Dashboard Publicitário</h1>
+
+  <label>ID do Cliente (Conta de Anúncio):</label><br />
+  <input type="text" id="clientId" placeholder="Ex: 3369787843155297" /><br />
+
+  <label>Data Início:</label><br />
+  <input type="date" id="startDate" /><br />
+
+  <label>Data Fim:</label><br />
+  <input type="date" id="endDate" /><br />
+
+  <button id="btnGenerateGoal">Gerar Análise de Metas</button>
+  <button id="btnGenerateDetailed">Gerar Métricas Detalhadas</button>
+  <script>
+    // Botão de Métricas Detalhadas
+    document.getElementById("btnGenerateDetailed").addEventListener("click", async () => {
+      const clientId = document.getElementById("clientId").value.trim();
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+  
+      if (!clientId || !startDate || !endDate) {
+        showMessage("detailedMetrics", "Por favor, preencha todos os campos.");
+        return;
+      }
+  
+      const url = `/generate_detailed_metrics/${clientId}?start_date=${startDate}&end_date=${endDate}`;
+      showMessage("detailedMetrics", "Carregando...");
+  
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+  
+        if (data.metrics) {
+          const metrics = data.metrics;
+  
+          let html = `
+            <table class="metrics-table">
+              <tr>
+                <th>Campo</th>
+                <th>Valor</th>
+              </tr>`;
+  
+          for (const [key, value] of Object.entries(metrics)) {
+            html += `
+              <tr>
+                <td>${key}</td>
+                <td>${value}</td>
+              </tr>`;
+          }
+  
+          html += "</table>";
+          document.getElementById("detailedMetrics").innerHTML = html;
+  
+        } else if (data.error) {
+          showMessage("detailedMetrics", "Erro: " + data.error);
+        }
+      } catch {
+        showMessage("detailedMetrics", "Erro na requisição.");
+      }
+    });
+  </script>
+  
+
+  <div id="resultGoal"></div>
+  <div id="detailedMetrics"></div>
+
+  <script>
+    // Função para mostrar mensagens simples
+    function showMessage(elementId, message) {
+      document.getElementById(elementId).innerText = message;
+    }
+  
+    // Botão de Métricas Detalhadas (corrigido e formatado)
+    document.getElementById("btnGenerateDetailed").addEventListener("click", async () => {
+      const clientId = document.getElementById("clientId").value.trim();
+      const startDate = document.getElementById("startDate").value;
+      const endDate = document.getElementById("endDate").value;
+  
+      if (!clientId || !startDate || !endDate) {
+        showMessage("detailedMetrics", "Por favor, preencha todos os campos.");
+        return;
+      }
+  
+      const url = `/generate_detailed_metrics/${clientId}?start_date=${startDate}&end_date=${endDate}`;
+      showMessage("detailedMetrics", "Carregando...");
+  
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+  
+        if (data.metrics) {
+          const metrics = data.metrics;
+  
+          let html = `
+            <table class="metrics-table">
+              <tr>
+                <th>📊 Campo</th>
+                <th>📈 Valor</th>
+              </tr>`;
+  
+          for (const [key, value] of Object.entries(metrics)) {
+            html += `
+              <tr>
+                <td>${key}</td>
+                <td>${value}</td>
+              </tr>`;
+          }
+  
+          html += "</table>";
+          document.getElementById("detailedMetrics").innerHTML = html;
+  
+        } else if (data.error) {
+          showMessage("detailedMetrics", "Erro: " + data.error);
+        }
+      } catch (error) {
+        showMessage("detailedMetrics", "Erro na requisição.");
+      }
+    });
+  </script>
+  
+</body>
+</html>

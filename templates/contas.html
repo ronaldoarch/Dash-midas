@@ -1,0 +1,61 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Contas de Anúncios</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #000;
+            color: #d4af37;
+            font-family: Arial, sans-serif;
+            padding: 30px;
+        }
+
+        h1 {
+            color: #d4af37;
+        }
+
+        .conta {
+            background-color: #111;
+            border: 1px solid #d4af37;
+            border-radius: 8px;
+            padding: 20px;
+            margin-bottom: 15px;
+            box-shadow: 0 0 15px rgba(212, 175, 55, 0.5);
+        }
+
+        a {
+            color: #d4af37;
+            text-decoration: none;
+        }
+
+        a:hover {
+            text-decoration: underline;
+        }
+
+        .voltar {
+            margin-top: 20px;
+            display: inline-block;
+        }
+    </style>
+</head>
+<body>
+    <h1>Contas de Anúncios Vinculadas</h1>
+
+    {% if contas %}
+        {% for conta in contas %}
+            <div class="conta">
+                <p><strong>Nome:</strong> {{ conta.nome }}</p>
+                <p><strong>ID:</strong> {{ conta.id }}</p>
+                <p><strong>Business Manager:</strong> {{ conta.bm }}</p>
+                <a href="{{ url_for('dashboard', conta_id=conta.id) }}">Ver Dashboard</a>
+            </div>
+        {% endfor %}
+    {% else %}
+        <p>Nenhuma conta encontrada ou token inválido.</p>
+    {% endif %}
+
+    <a href="{{ url_for('config') }}" class="voltar">← Voltar para Configurações</a>
+</body>
+</html>

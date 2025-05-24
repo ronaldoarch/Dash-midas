@@ -1,0 +1,128 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Configurações - IA Midas</title>
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <style>
+    body {
+      background: linear-gradient(135deg, #181818 0%, #232526 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+    .config-card {
+      background: #111;
+      border-radius: 16px;
+      box-shadow: 0 0 32px #d4af3755, 0 2px 8px #000a;
+      padding: 36px 32px 28px 32px;
+      max-width: 420px;
+      width: 100%;
+      margin: 32px auto;
+      color: #FFD700;
+      display: flex;
+      flex-direction: column;
+      gap: 18px;
+      position: relative;
+    }
+    .config-card h2 {
+      text-align: center;
+      margin-bottom: 18px;
+      font-size: 2rem;
+      font-weight: 700;
+      letter-spacing: 1px;
+      color: #FFD700;
+      text-shadow: 0 0 8px #FFD70044;
+    }
+    .config-card label {
+      font-weight: 600;
+      margin-bottom: 4px;
+      display: flex;
+      align-items: center;
+      gap: 6px;
+      font-size: 1.05em;
+    }
+    .config-card input[type="text"] {
+      width: 100%;
+      padding: 10px 12px;
+      border-radius: 8px;
+      border: 1px solid #FFD70099;
+      background: #181818;
+      color: #FFD700;
+      font-size: 1em;
+      margin-bottom: 10px;
+      transition: border 0.2s, box-shadow 0.2s;
+    }
+    .config-card input[type="text"]:focus {
+      border: 1.5px solid #FFD700;
+      box-shadow: 0 0 8px #FFD70055;
+      outline: none;
+    }
+    .config-card button {
+      background: linear-gradient(90deg, #FFD700 60%, #d4af37 100%);
+      color: #181818;
+      font-weight: bold;
+      border: none;
+      border-radius: 8px;
+      padding: 12px 0;
+      font-size: 1.1em;
+      margin-top: 10px;
+      box-shadow: 0 2px 8px #FFD70033;
+      cursor: pointer;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+    }
+    .config-card button:hover {
+      background: #FFD700;
+      color: #000;
+      box-shadow: 0 0 16px #FFD70088;
+    }
+    .config-card .icon {
+      font-size: 1.2em;
+      margin-right: 4px;
+      color: #FFD700;
+    }
+    .config-card .opcional {
+      color: #888;
+      font-size: 0.95em;
+      font-weight: 400;
+    }
+    .config-card .dashboard-link {
+      margin-top: 18px;
+      text-align: center;
+      display: block;
+      color: #FFD700;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.05em;
+      transition: color 0.2s;
+    }
+    .config-card .dashboard-link:hover {
+      color: #fffbe6;
+      text-decoration: underline;
+    }
+    @media (max-width: 600px) {
+      .config-card {
+        padding: 18px 6vw 18px 6vw;
+        max-width: 98vw;
+      }
+    }
+  </style>
+</head>
+<body>
+  <form class="config-card" method="POST" action="{{ url_for('config') }}">
+    <h2>Configurações IA Midas</h2>
+    <label><span class="icon">🆔</span>Meta App ID</label>
+    <input type="text" name="app_id" value="{{ meta.app_id if meta else '' }}" required />
+    <label><span class="icon">🔑</span>Meta App Secret</label>
+    <input type="text" name="app_secret" value="{{ meta.app_secret if meta else '' }}" required />
+    <label><span class="icon">🔒</span>Meta Access Token (Long Lived)</label>
+    <input type="text" name="access_token" value="{{ meta.access_token if meta else '' }}" required />
+    <label><span class="icon">💬</span>Google Chat Webhook URL <span class="opcional">(opcional)</span></label>
+    <input type="text" name="webhook_url" value="{{ meta.webhook_url if meta else '' }}" />
+    <button type="submit">Salvar</button>
+    <a href="{{ url_for('dashboard', conta_id='3369787843155297') }}" class="dashboard-link">Voltar ao Dashboard</a>
+  </form>
+</body>
+</html>

@@ -1,0 +1,47 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Análise de Risco</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #000;
+            color: #FFD700;
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+        }
+        h1 {
+            text-align: center;
+        }
+        label, input, button {
+            display: block;
+            margin: 10px auto;
+            text-align: center;
+        }
+        input, button {
+            padding: 0.5rem;
+            background-color: #222;
+            border: 1px solid #FFD700;
+            color: #FFD700;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #FFD700;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Análise de Risco de Criativos</h1>
+    <form method="GET" action="/generate_risk/test_client">
+        <label for="start_date">Data Início</label>
+        <input type="date" name="start_date" id="start_date">
+
+        <label for="end_date">Data Fim</label>
+        <input type="date" name="end_date" id="end_date">
+
+        <button type="submit">Analisar Riscos</button>
+    </form>
+</body>
+</html>

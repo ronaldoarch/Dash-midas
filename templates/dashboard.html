@@ -1,0 +1,1193 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8" />
+  <title>Dashboard - IA Midas</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Montserrat:400,700|Playfair+Display:700&display=swap">
+  <style>
+    body {
+      margin: 0;
+      font-family: 'Montserrat', Arial, sans-serif;
+      background: linear-gradient(135deg, #101014 0%, #23243a 100%);
+      color: #FFD700;
+      min-height: 100vh;
+      display: flex;
+    }
+    .sidebar {
+      width: 240px;
+      background: linear-gradient(135deg, #181818 60%, #23243a 100%);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 40px 0 0 0;
+      box-shadow: 2px 0 24px #000a;
+      position: fixed;
+      left: 0;
+      top: 0;
+      z-index: 10;
+      border-right: 1.5px solid #FFD70044;
+    }
+    .sidebar h2 {
+      color: #FFD700;
+      margin-bottom: 40px;
+      font-size: 2em;
+      letter-spacing: 3px;
+      font-weight: 700;
+      text-shadow: 0 0 18px #FFD70055, 0 2px 0 #fff2;
+      font-family: 'Playfair Display', serif;
+      border-bottom: 2px solid #FFD70055;
+      padding-bottom: 8px;
+      width: 80%;
+      text-align: center;
+    }
+    .sidebar a {
+      color: #FFD700;
+      text-decoration: none;
+      font-weight: 600;
+      font-size: 1.12em;
+      margin: 16px 0;
+      padding: 12px 36px;
+      border-radius: 12px 0 0 12px;
+      display: block;
+      width: 100%;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+      border-left: 3px solid transparent;
+    }
+    .sidebar a.active, .sidebar a:hover {
+      background: linear-gradient(90deg, #FFD70033 60%, #d4af3722 100%);
+      color: #232526;
+      border-left: 3px solid #FFD700;
+      box-shadow: 0 0 12px #FFD70033;
+    }
+    .main-content {
+      margin-left: 240px;
+      width: 100%;
+      padding: 56px 7vw 40px 7vw;
+      min-height: 100vh;
+      background: linear-gradient(135deg, #23243a 0%, #101014 100%);
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    .dashboard-header {
+      font-size: 2.5em;
+      font-weight: bold;
+      color: #FFD700;
+      margin-bottom: 24px;
+      letter-spacing: 3px;
+      text-shadow: 0 0 24px #FFD70055, 0 2px 0 #fff2;
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      position: relative;
+    }
+    .dashboard-header:after {
+      content: '';
+      display: block;
+      margin: 12px auto 0 auto;
+      width: 80px;
+      height: 3px;
+      border-radius: 2px;
+      background: linear-gradient(90deg, #FFD700 40%, #fff2 100%);
+      box-shadow: 0 0 8px #FFD70088;
+    }
+    .dashboard-select {
+      display: flex;
+      gap: 28px;
+      margin-bottom: 40px;
+      align-items: center;
+      justify-content: center;
+      background: rgba(35,36,58,0.45);
+      border-radius: 16px;
+      box-shadow: 0 0 18px #FFD70022;
+      padding: 18px 32px;
+      border: 1.5px solid #FFD70033;
+      backdrop-filter: blur(6px);
+    }
+    .dashboard-select label {
+      font-weight: 600;
+      color: #FFD700;
+      margin-right: 8px;
+      font-size: 1.12em;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .dashboard-select select, .dashboard-select input[type="date"] {
+      padding: 10px 18px;
+      border-radius: 10px;
+      border: 1.5px solid #FFD70099;
+      background: rgba(35,36,58,0.7);
+      color: #FFD700;
+      font-size: 1.12em;
+      font-family: 'Montserrat', Arial, sans-serif;
+      outline: none;
+      transition: border 0.2s, box-shadow 0.2s;
+      box-shadow: 0 0 10px #FFD70022;
+      margin-right: 4px;
+      backdrop-filter: blur(2px);
+    }
+    .dashboard-select select:focus, .dashboard-select input[type="date"]:focus {
+      border: 2px solid #FFD700;
+      box-shadow: 0 0 12px #FFD70055;
+    }
+    .dashboard-select button {
+      background: linear-gradient(90deg,#FFD700 60%,#d4af37 100%);
+      color: #232526;
+      font-weight: bold;
+      border: none;
+      border-radius: 10px;
+      padding: 12px 28px;
+      font-size: 1.12em;
+      box-shadow: 0 2px 12px #FFD70033;
+      cursor: pointer;
+      margin-left: 14px;
+      position: relative;
+      overflow: hidden;
+      transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s;
+      outline: none;
+      z-index: 1;
+      animation: btnGlow 2.5s infinite alternate;
+    }
+    .dashboard-select button#btnOtimizar {
+      background: linear-gradient(90deg,#00e676 60%,#ffd600 100%);
+      box-shadow: 0 2px 12px #00e67633;
+      animation: btnGlowGreen 2.5s infinite alternate;
+    }
+    @keyframes btnGlow {
+      0% { box-shadow: 0 0 12px #FFD70033, 0 0 0 #FFD70000; }
+      100% { box-shadow: 0 0 24px #FFD70088, 0 0 8px #FFD70044; }
+    }
+    @keyframes btnGlowGreen {
+      0% { box-shadow: 0 0 12px #00e67633, 0 0 0 #00e67600; }
+      100% { box-shadow: 0 0 24px #00e67688, 0 0 8px #FFD70044; }
+    }
+    .metrics-cards {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 36px;
+      margin-bottom: 36px;
+      justify-content: center;
+    }
+    .metric-card {
+      background: rgba(35,36,58,0.55);
+      color: #FFD700;
+      border-radius: 22px;
+      box-shadow: 0 0 32px #FFD70022, 0 2px 0 #fff1;
+      padding: 38px 44px;
+      min-width: 200px;
+      text-align: center;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      transition: transform 0.18s, box-shadow 0.18s, border 0.18s;
+      position: relative;
+      overflow: hidden;
+      border: 2px solid #FFD70055;
+      backdrop-filter: blur(8px);
+    }
+    .metric-card:before {
+      content: '';
+      position: absolute;
+      top: -40px; left: -40px;
+      width: 100px; height: 100px;
+      background: radial-gradient(circle, #FFD70033 0%, transparent 80%);
+      z-index: 0;
+      pointer-events: none;
+      animation: pulseGlow 2.5s infinite alternate;
+    }
+    .metric-card:hover {
+      transform: translateY(-6px) scale(1.03);
+      box-shadow: 0 0 48px #FFD70055, 0 2px 0 #fff2;
+      border: 2.5px solid #FFD700;
+    }
+    @keyframes pulseGlow {
+      0% { opacity: 0.7; }
+      100% { opacity: 0.3; }
+    }
+    .metric-icon {
+      font-size: 2.7em;
+      margin-bottom: 12px;
+      filter: drop-shadow(0 0 10px #FFD70088);
+      z-index: 1;
+      text-shadow: 0 0 8px #FFD70044;
+    }
+    .metric-title {
+      font-size: 1.18em;
+      color: #FFD700;
+      margin-bottom: 10px;
+      font-weight: 600;
+      z-index: 1;
+      font-family: 'Montserrat', Arial, sans-serif;
+      letter-spacing: 1px;
+    }
+    .metric-value {
+      font-size: 2.2em;
+      font-weight: bold;
+      color: #232526;
+      background: linear-gradient(90deg, #FFD700 60%, #d4af37 100%);
+      border-radius: 12px;
+      padding: 8px 28px;
+      display: inline-block;
+      margin-bottom: 2px;
+      box-shadow: 0 0 16px #FFD70044;
+      z-index: 1;
+      letter-spacing: 1.5px;
+      border: 1.5px solid #FFD70077;
+    }
+    .section-title {
+      color: #FFD700;
+      font-size: 1.3em;
+      font-weight: bold;
+      margin-top: 36px;
+      margin-bottom: 16px;
+      border-bottom: 2.5px solid #FFD70077;
+      padding-bottom: 6px;
+      text-align: center;
+      font-family: 'Playfair Display', serif;
+      letter-spacing: 1.5px;
+      position: relative;
+    }
+    .section-title:before {
+      content: '◆';
+      color: #FFD700;
+      margin-right: 8px;
+      font-size: 1.1em;
+      opacity: 0.7;
+    }
+    .section-title:after {
+      content: '◆';
+      color: #FFD700;
+      margin-left: 8px;
+      font-size: 1.1em;
+      opacity: 0.7;
+    }
+    .health-bar-container-vertical {
+      margin: 32px 0 40px 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 16px;
+      background: rgba(35,36,58,0.45);
+      border-radius: 16px;
+      box-shadow: 0 0 18px #FFD70022;
+      padding: 18px 32px 24px 32px;
+      border: 1.5px solid #FFD70033;
+      backdrop-filter: blur(6px);
+    }
+    .health-bar-bg-vertical {
+      width: 44px;
+      height: 240px;
+      background: #22242a;
+      border-radius: 22px;
+      box-shadow: 0 0 16px #FFD70033;
+      overflow: hidden;
+      margin-bottom: 8px;
+      display: flex;
+      align-items: flex-end;
+      border: 2px solid #FFD70044;
+    }
+    .health-bar-fill-vertical {
+      width: 100%;
+      height: 80%;
+      background: linear-gradient(0deg, #ff1744 0%, #ffd600 60%, #00e676 100%);
+      border-radius: 0 0 22px 22px;
+      transition: height 0.5s, background 0.5s;
+      box-shadow: 0 0 10px #FFD70088;
+    }
+    .health-bar-label {
+      font-weight: bold;
+      font-size: 1.25em;
+      color: #FFD700;
+      text-shadow: 0 0 10px #FFD70044;
+      margin-top: 10px;
+      font-family: 'Montserrat', Arial, sans-serif;
+    }
+    .suggestion-box {
+      background: rgba(35,36,58,0.55);
+      border-radius: 18px;
+      box-shadow: 0 0 20px #FFD70022;
+      padding: 28px 38px;
+      margin: 0 12px;
+      color: #FFD700;
+      min-width: 340px;
+      max-width: 520px;
+      margin-bottom: 28px;
+      font-size: 1.12em;
+      font-family: 'Montserrat', Arial, sans-serif;
+      opacity: 0.98;
+      border: 2px solid #FFD70055;
+      backdrop-filter: blur(8px);
+    }
+    .dashboard-list {
+      color: #FFD700;
+      margin: 0 0 14px 0;
+      padding-left: 22px;
+      font-size: 1.08em;
+    }
+    .dashboard-list li {
+      margin-bottom: 8px;
+      font-size: 1.07em;
+      letter-spacing: 0.7px;
+    }
+    @media (max-width: 900px) {
+      .main-content { padding: 24px 2vw 24px 2vw; }
+      .metrics-cards { flex-direction: column; gap: 20px; }
+      .suggestion-box { min-width: 90vw; max-width: 98vw; }
+      .health-bar-bg-vertical { height: 120px; }
+      .sidebar { width: 100vw; height: 60px; flex-direction: row; position: fixed; top: 0; left: 0; right: 0; z-index: 100; border-right: none; border-bottom: 1.5px solid #FFD70044; align-items: center; justify-content: flex-start; padding: 0 10px; }
+      .sidebar h2 { font-size: 1.1em; margin-bottom: 0; border-bottom: none; padding-bottom: 0; width: auto; margin-top: 0; }
+      .sidebar a { border-radius: 8px; padding: 8px 10px; font-size: 0.95em; margin: 0 4px; display: flex; align-items: center; }
+      .main-content { margin-left: 0; margin-top: 60px; }
+      .dashboard-select { flex-direction: column; gap: 12px; width: 98vw; max-width: 98vw; padding: 10px 2vw; }
+      .dashboard-select label, .dashboard-select select, .dashboard-select input[type="date"], .dashboard-select button { width: 100%; max-width: 100%; margin: 0; }
+    }
+    @media (max-width: 600px) {
+      .metrics-cards { gap: 10px; }
+      .metric-card { min-width: 90vw; padding: 18px 4vw; font-size: 0.98em; }
+      .dashboard-header { font-size: 1.3em; }
+      .suggestion-box { font-size: 0.98em; padding: 12px 2vw; }
+      .main-content { padding: 10px 1vw 10px 1vw; }
+    }
+    @keyframes midasPulse {
+      0% { box-shadow: 0 0 0 0 #FFD70055; opacity: 0.7; }
+      100% { box-shadow: 0 0 32px 16px #FFD70033; opacity: 1; }
+    }
+    #midas-avatar {
+      position: fixed;
+      bottom: 24px;
+      right: 24px;
+      z-index: 9999;
+      width: 80px;
+      height: 80px;
+      cursor: pointer;
+      user-select: none;
+      transition: left 1s, top 1s, right 1s, bottom 1s;
+    }
+    .midas-body { position: relative; width: 80px; height: 80px; }
+    .midas-face {
+      position: absolute; left: 20px; top: 20px;
+      width: 40px; height: 40px; background: gold;
+      border-radius: 50%; border: 3px solid #d4af37;
+      box-shadow: 0 0 8px #ffd70099; z-index: 2;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .midas-eye {
+      width: 8px; height: 8px; background: #232526;
+      border-radius: 50%; position: absolute; top: 16px;
+      transition: left 0.2s, top 0.2s;
+    }
+    .midas-eye.left { left: 10px; }
+    .midas-eye.right { left: 22px; }
+    .midas-hood {
+      position: absolute; left: 10px; top: 0;
+      width: 60px; height: 32px; background: #232526;
+      border-radius: 50% 50% 40% 40%/80% 80% 40% 40%;
+      z-index: 3; opacity: 0.85; display: none;
+    }
+    .midas-ears {
+      position: absolute;
+      left: 10px; top: 10px;
+      width: 60px; height: 20px;
+      background: #ffd700;
+      border-radius: 50% 50% 0 0;
+      z-index: 1;
+      opacity: 0.7;
+    }
+    .midas-arms {
+      position: absolute;
+      left: 0; top: 40px;
+      width: 80px; height: 10px;
+      background: transparent;
+      z-index: 2;
+    }
+    .midas-arm {
+      position: absolute;
+      width: 22px; height: 10px;
+      background: #ffd700;
+      border-radius: 10px;
+      top: 0;
+      left: 0;
+      transition: transform 0.2s, top 0.3s, left 0.3s;
+    }
+    .midas-arm.right { left: 58px; }
+    .midas-walk .midas-arm.left {
+      animation: arm-walk-left 0.6s infinite alternate;
+    }
+    .midas-walk .midas-arm.right {
+      animation: arm-walk-right 0.6s infinite alternate;
+    }
+    @keyframes arm-walk-left {
+      0% { transform: rotate(-30deg); }
+      100% { transform: rotate(30deg); }
+    }
+    @keyframes arm-walk-right {
+      0% { transform: rotate(30deg); }
+      100% { transform: rotate(-30deg); }
+    }
+    .midas-legs {
+      position: absolute;
+      left: 25px; top: 60px;
+      width: 30px; height: 18px;
+      background: transparent;
+      z-index: 2;
+    }
+    .midas-leg {
+      position: absolute;
+      width: 12px; height: 18px;
+      background: #d4af37;
+      border-radius: 0 0 10px 10px;
+      left: 0;
+      top: 0;
+      transition: transform 0.2s;
+    }
+    .midas-leg.right { left: 16px; }
+    .midas-walk .midas-leg.left {
+      animation: leg-walk-left 0.6s infinite alternate;
+    }
+    .midas-walk .midas-leg.right {
+      animation: leg-walk-right 0.6s infinite alternate;
+    }
+    @keyframes leg-walk-left {
+      0% { transform: rotate(20deg) translateY(0); }
+      100% { transform: rotate(-30deg) translateY(4px); }
+    }
+    @keyframes leg-walk-right {
+      0% { transform: rotate(-20deg) translateY(0); }
+      100% { transform: rotate(30deg) translateY(4px); }
+    }
+    .midas-notebook {
+      position: absolute; left: 28px; top: 48px;
+      width: 24px; height: 12px; background: #bdbdbd;
+      border-radius: 3px; border: 2px solid #232526;
+      z-index: 4; display: none;
+    }
+    .midas-zs {
+      position: absolute;
+      left: 60px; top: 0;
+      font-size: 1.1em;
+      color: #bdbdbd;
+      opacity: 0;
+      transition: opacity 0.4s;
+      pointer-events: none;
+    }
+    @keyframes midas-dance {
+      0%   { transform: rotate(-8deg) scale(1); }
+      50%  { transform: rotate(8deg) scale(1.05); }
+      100% { transform: rotate(-8deg) scale(1); }
+    }
+    @keyframes midas-arms {
+      0%   { transform: rotate(-10deg);}
+      100% { transform: rotate(10deg);}
+    }
+    .midas-sleep .midas-body {
+      animation: midas-sleep 2.5s infinite alternate;
+    }
+    @keyframes midas-sleep {
+      0%   { transform: rotate(0deg) scale(1);}
+      100% { transform: rotate(20deg) scale(0.98);}
+    }
+    .midas-sleep .midas-zs {
+      opacity: 1;
+    }
+    .midas-walk { animation: midas-walk 1.2s steps(4) infinite; }
+    @keyframes midas-walk {
+      0% { transform: translateY(0); }
+      25% { transform: translateY(-4px); }
+      50% { transform: translateY(0); }
+      75% { transform: translateY(4px); }
+      100% { transform: translateY(0); }
+    }
+    .midas-sit .midas-legs { top: 70px; }
+    .midas-sit .midas-arms { top: 50px; }
+    .midas-sit .midas-body { transform: scaleY(0.9); }
+    .midas-sit .midas-leg.left {
+      transform: rotate(-60deg) translateY(10px) scaleY(0.7);
+    }
+    .midas-sit .midas-leg.right {
+      transform: rotate(60deg) translateY(10px) scaleY(0.7);
+    }
+    .midas-sit .midas-arm.left {
+      top: 8px; left: 8px; transform: rotate(-40deg) scaleX(0.8);
+    }
+    .midas-sit .midas-arm.right {
+      top: 8px; left: 54px; transform: rotate(40deg) scaleX(0.8);
+    }
+    .midas-sit .midas-body { transform: scaleY(0.9) translateY(8px); }
+    .midas-hood-on .midas-hood { display: block; }
+    .midas-notebook-on .midas-notebook { display: block; }
+  </style>
+</head>
+<body>
+  <button class="theme-toggle" id="themeToggle" title="Alternar tema">🌙</button>
+  <div class="sidebar" id="sidebar">
+    <button id="sidebarToggle" style="position:absolute;top:12px;left:12px;background:none;border:none;color:#FFD700;font-size:2em;cursor:pointer;z-index:20;outline:none;" aria-label="Abrir/Fechar menu">&#9776;</button>
+    <h2 style="margin-top:32px;">IA Midas</h2>
+    <a href="{{ url_for('dashboard') }}" class="active">🏠 <span>Dashboard</span></a>
+    <a href="{{ url_for('config') }}">⚙️ <span>Configurações Meta</span></a>
+  </div>
+  {% if alerta_saldo %}
+    <div style="position:fixed; top:0; left:240px; right:0; z-index:100; margin:0 auto; font-size:1.12em; color:#fff; background:linear-gradient(90deg,#ff1744 60%,#ffd600 100%); border-radius:0 0 10px 10px; padding:14px 32px; box-shadow:0 0 16px #ff174488; font-weight:bold; letter-spacing:1px; text-align:center;">
+      ⚠️ {{ alerta_saldo }}
+    </div>
+  {% endif %}
+  <div class="main-content">
+    <form class="dashboard-select" method="get" action="{{ url_for('dashboard') }}">
+      <label for="conta_id">Conta de Anúncio:</label>
+      <select name="conta_id" id="conta_id" onchange="this.form.submit()">
+        {% for conta in contas %}
+          <option value="{{ conta.id }}" {% if dados.conta_id == conta.id %}selected{% endif %}>{{ conta.name }}</option>
+        {% endfor %}
+      </select>
+      <label for="campanha_id">Campanha:</label>
+      <select name="campanha_id" id="campanha_id" onchange="this.form.submit()">
+        {% for campanha in campanhas %}
+          <option value="{{ campanha.id }}" {% if dados.campanha_id == campanha.id %}selected{% endif %}>{{ campanha.name }}</option>
+        {% endfor %}
+      </select>
+      <label for="start_date">Início:</label>
+      <input type="date" name="start_date" id="start_date" value="{{ start_date if start_date else '' }}" onchange="this.form.submit()" style="padding:8px 12px; border-radius:8px; border:1.5px solid #FFD70099; background:#232526; color:#FFD700; font-size:1.08em; font-family:'Montserrat',Arial,sans-serif; outline:none; margin-right:8px;">
+      <label for="end_date">Fim:</label>
+      <input type="date" name="end_date" id="end_date" value="{{ end_date if end_date else '' }}" onchange="this.form.submit()" style="padding:8px 12px; border-radius:8px; border:1.5px solid #FFD70099; background:#232526; color:#FFD700; font-size:1.08em; font-family:'Montserrat',Arial,sans-serif; outline:none; margin-right:8px;">
+      <button type="button" id="btnExportar" style="background:linear-gradient(90deg,#FFD700 60%,#d4af37 100%); color:#232526; font-weight:bold; border:none; border-radius:8px; padding:10px 24px; font-size:1.08em; box-shadow:0 2px 8px #FFD70033; cursor:pointer; transition:background 0.2s, color 0.2s, box-shadow 0.2s; margin-left:12px;">Exportar Relatório</button>
+      <button type="button" id="btnOtimizar" style="background:linear-gradient(90deg,#00e676 60%,#ffd600 100%); color:#232526; font-weight:bold; border:none; border-radius:8px; padding:10px 24px; font-size:1.08em; box-shadow:0 2px 8px #00e67633; cursor:pointer; transition:background 0.2s, color 0.2s, box-shadow 0.2s; margin-left:12px;">Otimizar Campanha</button>
+    </form>
+    <div style="margin-bottom: 18px; margin-top: 18px; color: #FFD700; font-size: 1.01em; background: #232526; border-radius: 8px; padding: 10px 24px; box-shadow: 0 0 8px #FFD70022; display: inline-block;">
+      <b>Como funciona a otimização automática:</b>
+      <ul style="margin: 6px 0 0 18px; color: #FFD700; font-size: 0.98em;">
+        <li>Se o <b>Custo por Lead</b> (CPL) estiver <b>abaixo de R$ 3,00</b> e houver saldo suficiente, o orçamento diário será <b>aumentado em 10%</b>.</li>
+        <li>Se o <b>CPL</b> estiver <b>acima de R$ 5,00</b>, o orçamento diário será <b>reduzido em 10%</b>.</li>
+        <li>Se o CPL estiver entre R$ 3,00 e R$ 5,00, nenhuma alteração será feita.</li>
+        <li>A otimização é feita no <b>primeiro conjunto de anúncios</b> da campanha selecionada.</li>
+      </ul>
+    </div>
+    {% if saldo_disponivel is not none %}
+      <div style="margin-bottom:18px; font-size:1.18em; color:#FFD700; background:#232526; border-radius:10px; padding:12px 32px; box-shadow:0 0 12px #FFD70022; display:inline-block;">
+        <b>Saldo disponível para anúncios:</b> R$ {{ '%.2f' % (saldo_disponivel|float/100) if saldo_disponivel else '0,00' }}
+      </div>
+    {% endif %}
+    <div style="margin-bottom:18px;">
+      <label style="font-weight:bold;">Personalize os cards do dashboard:</label>
+      <div id="cardToggles" style="display:flex;flex-wrap:wrap;gap:10px;justify-content:center;margin-top:8px;margin-bottom:8px;"></div>
+    </div>
+    <div style="margin-bottom:18px;display:flex;gap:10px;justify-content:center;">
+      <button type="button" id="btnExportCSV">Exportar CSV</button>
+      <button type="button" id="btnExportExcel">Exportar Excel</button>
+    </div>
+    <!-- NOVO: Busca rápida nos cards -->
+    <div style="margin-bottom:12px;display:flex;justify-content:center;">
+      <input type="text" id="searchMetric" placeholder="Buscar métrica..." style="padding:8px 16px;max-width:320px;width:100%;border-radius:8px;border:1px solid #FFD700;">
+    </div>
+    <div style="display: flex; flex-wrap: wrap; gap: 32px; justify-content: center; align-items: flex-start; width: 100%;">
+      <div class="metrics-cards" style="flex: 2;">
+        <!-- cards de métricas -->
+        {% if is_cassino %}
+        <div class="metric-card">
+          <div class="metric-icon">👥</div>
+          <div class="metric-title">PM (Pessoas Alcançadas)</div>
+          <div class="metric-value">{{ dados.alcance }}</div>
+        </div>
+        {% else %}
+        <div class="metric-card">
+          <div class="metric-icon">📈</div>
+          <div class="metric-title">Impressões</div>
+          <div class="metric-value">{{ dados.impressoes }}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">👥</div>
+          <div class="metric-title">Alcance</div>
+          <div class="metric-value">{{ dados.alcance }}</div>
+        </div>
+        {% endif %}
+        <div class="metric-card">
+          <div class="metric-icon">📊</div>
+          <div class="metric-title">CTR</div>
+          <div class="metric-value">{{ dados.ctr }}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">💰</div>
+          <div class="metric-title">{% if is_cassino %}CAC{% else %}CPL{% endif %}</div>
+          <div class="metric-value">R$ {{ '%.2f' % dados.cac if dados.cac else '-' }}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">👑</div>
+          <div class="metric-title">{% if is_cassino %}Clientes (Depósito/FTD){% else %}Leads{% endif %}</div>
+          <div class="metric-value">{{ dados.quantidade_clientes }}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">💸</div>
+          <div class="metric-title">Investimento</div>
+          <div class="metric-value">R$ {{ '%.2f' % dados.investimento if dados.investimento else '-' }}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">🖱️</div>
+          <div class="metric-title">Cliques</div>
+          <div class="metric-value">{{ dados.cliques }}</div>
+        </div>
+        <div class="metric-card">
+          <div class="metric-icon">💵</div>
+          <div class="metric-title">CPC</div>
+          <div class="metric-value">R$ {{ '%.2f' % dados.cpc if dados.cpc else '-' }}</div>
+        </div>
+        {% if not is_cassino %}
+        <div class="metric-card">
+          <div class="metric-icon">🎯</div>
+          <div class="metric-title">Resultados</div>
+          <div class="metric-value">{{ dados.resultados }}</div>
+        </div>
+        {% endif %}
+      </div>
+    </div>
+    <!-- Sugestões preditivas -->
+    <div class="suggestion-box">
+      <b>Sugestões de Melhoria:</b>
+      <ul>
+        {% set cac = dados.cac or 0 %}
+        {% set quantidade_clientes = dados.quantidade_clientes or 0 %}
+        {% set ctr = dados.ctr.replace('%','')|float if dados.ctr and dados.ctr != '-' else 0 %}
+        {% set investimento = dados.investimento or 0 %}
+        {% set impressoes = dados.impressoes or 0 %}
+        {% set pm = dados.alcance or 0 %}
+        {% set cpc = dados.cpc or 0 %}
+        {% set is_cassino = is_cassino %}
+        {% set sugestoes = [] %}
+        {% set positivos = [] %}
+        {# CAC/CPL #}
+        {% if cac and cac <= 5 %}
+          {% set _ = positivos.append('Excelente CAC/CPL. Continue otimizando para manter esse resultado.') %}
+        {% elif cac and cac > 15 %}
+          {% set _ = sugestoes.append('O CAC/CPL está alto. Considere revisar segmentação, criativos e oferta. Teste públicos diferentes e otimize anúncios de baixo desempenho.') %}
+        {% elif cac %}
+          {% set _ = sugestoes.append('O CAC/CPL está dentro da média, mas pode ser melhorado. Experimente pequenas mudanças em criativos ou segmentação.') %}
+        {% endif %}
+        {# Clientes/Leads #}
+        {% if quantidade_clientes > 50 %}
+          {% set _ = positivos.append('Ótima quantidade de clientes/leads para o período!') %}
+        {% elif quantidade_clientes < 5 and quantidade_clientes > 0 %}
+          {% set _ = sugestoes.append('Poucos clientes/leads convertidos. Analise o funil de cadastro, revise a oferta e teste abordagens diferentes para aumentar conversão.') %}
+        {% endif %}
+        {# CTR #}
+        {% if ctr < 1.0 %}
+          {% set _ = sugestoes.append('CTR baixo. Teste banners e criativos mais chamativos, ajuste chamadas para ação e avalie se o público está bem segmentado.') %}
+        {% elif ctr > 5.0 %}
+          {% set _ = positivos.append('CTR excelente! Seus anúncios estão atraentes para o público.') %}
+        {% elif ctr < 2.0 and ctr > 0 %}
+          {% set _ = sugestoes.append('CTR abaixo do ideal. Considere testar novos formatos de anúncio e revisar o texto das campanhas.') %}
+        {% endif %}
+        {# Investimento x Conversão #}
+        {% if investimento > 1000 and quantidade_clientes < 10 %}
+          {% set _ = sugestoes.append('Investimento alto e poucos clientes. Avalie o ROI, reduza orçamento em campanhas pouco performáticas e foque nos melhores anúncios.') %}
+        {% elif investimento < 200 and quantidade_clientes > 20 %}
+          {% set _ = positivos.append('Ótima eficiência: muitos clientes com baixo investimento!') %}
+        {% endif %}
+        {# Impressões e Alcance (para contas normais) #}
+        {% if not is_cassino %}
+          {% if impressoes < 10000 %}
+            {% set _ = sugestoes.append('Poucas impressões. Amplie o orçamento ou aumente o público para gerar mais visibilidade.') %}
+          {% endif %}
+          {% if pm < 5000 %}
+            {% set _ = sugestoes.append('Alcance baixo. Tente expandir a segmentação ou aumentar o investimento.') %}
+          {% endif %}
+          {% if impressoes > 100000 and quantidade_clientes < 10 %}
+            {% set _ = sugestoes.append('Muitas impressões, mas poucas conversões. Reveja a oferta, criativos e segmentação.') %}
+          {% endif %}
+        {% endif %}
+        {# PM (para cassinos) #}
+        {% if is_cassino %}
+          {% if pm < 5000 %}
+            {% set _ = sugestoes.append('Poucas pessoas alcançadas. Considere aumentar o orçamento ou expandir o público.') %}
+          {% endif %}
+          {% if pm > 50000 and quantidade_clientes < 10 %}
+            {% set _ = sugestoes.append('Muitas pessoas alcançadas, mas poucas conversões. Teste novas ofertas ou revise o funil de cadastro.') %}
+          {% endif %}
+        {% endif %}
+        {# CPC #}
+        {% if cpc > 3 %}
+          {% set _ = sugestoes.append('CPC alto. Tente melhorar a relevância dos anúncios e a segmentação.') %}
+        {% elif cpc < 0.5 and cpc > 0 %}
+          {% set _ = positivos.append('CPC muito baixo! Excelente eficiência nos cliques.') %}
+        {% endif %}
+        {# Sempre pelo menos uma sugestão #}
+        {% if sugestoes|length == 0 %}
+          {% set _ = sugestoes.append('Continue testando novos criativos, públicos e ofertas para manter ou melhorar a performance, mesmo com resultados excelentes.') %}
+        {% endif %}
+        {% for s in sugestoes %}
+          <li style="color:#FFD700;">{{ s }}</li>
+        {% endfor %}
+        {% if positivos|length > 0 %}
+          <li style="color:#00e676;"><b>Pontos positivos:</b></li>
+          {% for p in positivos %}
+            <li style="color:#00e676;">{{ p }}</li>
+          {% endfor %}
+        {% endif %}
+      </ul>
+    </div>
+    <!-- Gráfico de métricas + termômetro lado a lado -->
+    <div style="width:100%;max-width:1100px;margin:32px auto 0 auto;display:flex;align-items:center;justify-content:center;gap:48px;">
+      <div style="flex:2;">
+        <canvas id="graficoMetricas" height="110"></canvas>
+        <button type="button" id="btnExportPNG" style="margin-top:10px;">Exportar Gráfico PNG</button>
+      </div>
+      <div style="flex:0 0 180px;display:flex;justify-content:center;">
+        <div class="health-bar-container-vertical">
+          <div class="section-title">Saúde da Campanha</div>
+          <div class="health-bar-bg-vertical">
+            <div class="health-bar-fill-vertical" id="healthBar"></div>
+          </div>
+          <div class="health-bar-label" id="healthLabel">Saudável</div>
+        </div>
+      </div>
+    </div>
+  </div>
+  <!-- Avatar Midas super interativo -->
+  <div id="midas-avatar">
+    <div class="midas-body">
+      <div class="midas-hood"></div>
+      <div class="midas-face">
+        <div class="midas-eye left"></div>
+        <div class="midas-eye right"></div>
+      </div>
+      <div class="midas-ears"></div>
+      <div class="midas-arms">
+        <div class="midas-arm left"></div>
+        <div class="midas-arm right"></div>
+      </div>
+      <div class="midas-legs">
+        <div class="midas-leg left"></div>
+        <div class="midas-leg right"></div>
+      </div>
+      <div class="midas-notebook"></div>
+      <div class="midas-zs" id="midas-zs">Zzz</div>
+    </div>
+  </div>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <script>
+    // Termômetro de saúde vertical baseado no score de saúde
+    function atualizarSaudeCampanha(score) {
+      let percent = score;
+      let label = '';
+      let cor = '';
+      if (score >= 80) {
+        label = 'Ótimo';
+        cor = '#00e676'; // verde
+      } else if (score >= 50) {
+        label = 'Bom';
+        cor = '#ffd600'; // amarelo
+      } else {
+        label = 'Ruim';
+        cor = '#ff1744'; // vermelho
+      }
+      document.getElementById('healthBar').style.height = percent + '%';
+      document.getElementById('healthBar').style.background = cor;
+      document.getElementById('healthLabel').innerText = label;
+    }
+    // Sugestões dinâmicas
+    function gerarSugestoes(cpl, conversoes, alcance, ctr) {
+      let sugestoes = [];
+      let positivos = [];
+      if (cpl && cpl <= 3) {
+        positivos.push('Excelente custo por lead.');
+      } else if (cpl && cpl > 5) {
+        sugestoes.push('O custo por lead está elevado, tente otimizar seus anúncios.');
+      } else if (cpl) {
+        sugestoes.push('O custo por lead está dentro da média, mas pode ser melhorado.');
+      }
+      if (alcance && alcance > 50000) {
+        positivos.push('Ótimo alcance, sua campanha está atingindo muitas pessoas.');
+      } else if (alcance && alcance < 10000) {
+        sugestoes.push('O alcance está baixo, tente ampliar o público.');
+      }
+      if (conversoes && conversoes < 10) {
+        sugestoes.push('A conversão está baixa, avalie o criativo e o público.');
+      } else if (conversoes && conversoes > 100) {
+        positivos.push('Ótima taxa de conversão.');
+      }
+      if (ctr && ctr !== '-' && parseFloat(ctr) < 1.0) {
+        sugestoes.push('CTR baixo, teste novos criativos e públicos.');
+      } else if (ctr && ctr !== '-' && parseFloat(ctr) > 3.0) {
+        positivos.push('Ótimo CTR!');
+      }
+      let html = '';
+      if (positivos.length > 0) {
+        html += '<li><b>Pontos positivos:</b></li>';
+        positivos.forEach(p => html += `<li>- ${p}</li>`);
+      }
+      if (sugestoes.length > 0) {
+        html += '<li><b>Oportunidades de Melhoria:</b></li>';
+        sugestoes.forEach(s => html += `<li>- ${s}</li>`);
+      }
+      if (html === '') html = '<li>Nenhuma sugestão disponível para esta campanha.</li>';
+      document.getElementById('sugestoesList').innerHTML = html;
+    }
+    let chartMetricas = null;
+    async function atualizarGraficoMetricas() {
+      const contaId = document.getElementById('conta_id').value;
+      const campanhaId = document.getElementById('campanha_id').value;
+      if (!contaId || !campanhaId) return;
+      const resp = await fetch(`/api/meta-metrics-history?conta_id=${contaId}&campanha_id=${campanhaId}`);
+      const dados = await resp.json();
+      const ctx = document.getElementById('graficoMetricas').getContext('2d');
+      if (chartMetricas) chartMetricas.destroy();
+      chartMetricas = new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: dados.labels,
+          datasets: [
+            {
+              type: 'line',
+              label: 'Alcance',
+              data: dados.alcance,
+              borderColor: '#FFD700',
+              backgroundColor: 'rgba(255,215,0,0.15)',
+              borderWidth: 3,
+              tension: 0.3,
+              yAxisID: 'y',
+              pointBackgroundColor: '#FFD700',
+              pointRadius: 4,
+              order: 1
+            },
+            {
+              type: 'bar',
+              label: 'Impressões',
+              data: dados.impressoes,
+              backgroundColor: 'rgba(255,140,0,0.5)',
+              borderColor: '#FF8C00',
+              borderWidth: 1,
+              yAxisID: 'y',
+              order: 2
+            },
+            {
+              type: 'bar',
+              label: 'Cliques',
+              data: dados.cliques,
+              backgroundColor: 'rgba(0,230,118,0.5)',
+              borderColor: '#00e676',
+              borderWidth: 1,
+              yAxisID: 'y',
+              order: 3
+            },
+            {
+              type: 'bar',
+              label: 'Conversões',
+              data: dados.conversoes,
+              backgroundColor: 'rgba(33,150,243,0.5)',
+              borderColor: '#2196f3',
+              borderWidth: 1,
+              yAxisID: 'y',
+              order: 4
+            },
+            {
+              type: 'line',
+              label: 'Custo',
+              data: dados.custo,
+              borderColor: '#FF1744',
+              backgroundColor: 'rgba(255,23,68,0.15)',
+              borderWidth: 2,
+              tension: 0.3,
+              yAxisID: 'y',
+              pointBackgroundColor: '#FF1744',
+              pointRadius: 4,
+              order: 5
+            }
+          ]
+        },
+        options: {
+          responsive: true,
+          plugins: {
+            legend: { labels: { color: '#FFD700', font: { size: 14 } } },
+            title: { display: true, text: 'Evolução das Métricas', color: '#FFD700', font: { size: 18 } }
+          },
+          scales: {
+            x: { ticks: { color: '#FFD700' }, grid: { color: '#FFD70022' } },
+            y: { ticks: { color: '#FFD700' }, grid: { color: '#FFD70022' } }
+          }
+        }
+      });
+    }
+    document.getElementById('conta_id').addEventListener('change', atualizarGraficoMetricas);
+    document.getElementById('campanha_id').addEventListener('change', atualizarGraficoMetricas);
+    window.addEventListener('DOMContentLoaded', atualizarGraficoMetricas);
+    window.addEventListener('DOMContentLoaded', function() {
+      const cpl = parseFloat('{{ dados.cpl if dados.cpl else 0 }}');
+      const conversoes = parseInt('{{ dados.conversoes if dados.conversoes else 0 }}');
+      const alcance = parseInt('{{ dados.alcance if dados.alcance else 0 }}');
+      let ctr = '{{ dados.ctr if dados.ctr else "-" }}';
+      if (ctr && ctr !== '-' && ctr.includes('%')) ctr = ctr.replace('%','');
+      atualizarSaudeCampanha(parseInt('{{ saude_score|default(0) }}'));
+      // gerarSugestoes(cpl, conversoes, alcance, ctr); // REMOVIDO: sugestões agora são renderizadas pelo backend
+      // Botão de exportação
+      document.getElementById('btnExportar').onclick = async function() {
+        const btn = this;
+        const contaId = document.getElementById('conta_id').value;
+        const campanhaId = document.getElementById('campanha_id').value;
+        const startDate = document.getElementById('start_date').value;
+        const endDate = document.getElementById('end_date').value;
+        const nomeCampanha = document.getElementById('campanha_id').selectedOptions[0]?.text || '';
+        if (!contaId || !campanhaId) {
+          alert('Selecione uma conta e uma campanha para exportar o relatório.');
+          return;
+        }
+        btn.disabled = true;
+        btn.innerText = 'Exportando...';
+        let url = `/export-report?conta_id=${contaId}&campanha_id=${campanhaId}&nome_campanha=${encodeURIComponent(nomeCampanha)}`;
+        if (startDate) url += `&start_date=${startDate}`;
+        if (endDate) url += `&end_date=${endDate}`;
+        try {
+          const resp = await fetch(url);
+          if (!resp.ok) throw new Error('Erro ao gerar relatório.');
+          const blob = await resp.blob();
+          const link = document.createElement('a');
+          link.href = window.URL.createObjectURL(blob);
+          link.download = 'relatorio_meta_ads.pdf';
+          document.body.appendChild(link);
+          link.click();
+          link.remove();
+        } catch (e) {
+          alert('Erro ao exportar relatório. Tente novamente.');
+        }
+        btn.disabled = false;
+        btn.innerText = 'Exportar Relatório';
+      };
+      // Botão de otimização
+      document.getElementById('btnOtimizar').onclick = function() {
+        const campanhaId = document.getElementById('campanha_id').value;
+        const cpl = parseFloat('{{ dados.cpl if dados.cpl else 0 }}');
+        const saldo = parseFloat('{{ saldo_disponivel|float/100 if saldo_disponivel else 0 }}');
+        const btn = this;
+        btn.disabled = true;
+        btn.innerText = 'Otimizando...';
+        fetch('/otimizar-campanha', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+          body: `campanha_id=${campanhaId}&cpl=${cpl}&saldo=${saldo}`
+        })
+        .then(resp => resp.json())
+        .then(data => {
+          alert(data.message);
+          btn.disabled = false;
+          btn.innerText = 'Otimizar Campanha';
+        })
+        .catch(() => {
+          alert('Erro ao otimizar campanha.');
+          btn.disabled = false;
+          btn.innerText = 'Otimizar Campanha';
+        });
+      };
+    });
+    // Menu retrátil
+    const sidebar = document.getElementById('sidebar');
+    const sidebarToggle = document.getElementById('sidebarToggle');
+    const mainContent = document.querySelector('.main-content');
+    let sidebarOpen = true;
+    sidebarToggle.onclick = function() {
+      sidebarOpen = !sidebarOpen;
+      if (!sidebarOpen) {
+        sidebar.style.width = '60px';
+        mainContent.style.marginLeft = '60px';
+        Array.from(sidebar.querySelectorAll('h2, a span')).forEach(e => e.style.display = 'none');
+      } else {
+        sidebar.style.width = '240px';
+        mainContent.style.marginLeft = '240px';
+        Array.from(sidebar.querySelectorAll('h2, a span')).forEach(e => e.style.display = '');
+      }
+    };
+    // Olhar para o mouse
+    let midas = document.getElementById('midas-avatar');
+    let midasBody = midas.querySelector('.midas-body');
+    let hood = midas.querySelector('.midas-hood');
+    let notebook = midas.querySelector('.midas-notebook');
+    let eyes = midas.querySelectorAll('.midas-eye');
+    if(eyes.length === 2) {
+      document.addEventListener('mousemove', function(e) {
+        const rect = midas.getBoundingClientRect();
+        const centerX = rect.left + rect.width/2;
+        const centerY = rect.top + rect.height/2;
+        const dx = e.clientX - centerX;
+        const dy = e.clientY - centerY;
+        const angle = Math.atan2(dy, dx);
+        const dist = Math.min(8, Math.sqrt(dx*dx + dy*dy)/10);
+        eyes[0].style.left = (10 + Math.cos(angle)*dist) + 'px';
+        eyes[0].style.top = (16 + Math.sin(angle)*dist) + 'px';
+        eyes[1].style.left = (22 + Math.cos(angle)*dist) + 'px';
+        eyes[1].style.top = (16 + Math.sin(angle)*dist) + 'px';
+      });
+    }
+    // Andar aleatoriamente
+    function midasAndar() {
+      let vw = window.innerWidth, vh = window.innerHeight;
+      let x = Math.random() * (vw - 100);
+      let y = Math.random() * (vh - 120);
+      midas.style.transition = 'left 1.2s cubic-bezier(.68,-0.55,.27,1.55), top 1.2s cubic-bezier(.68,-0.55,.27,1.55)';
+      midas.style.left = x + 'px';
+      midas.style.top = y + 'px';
+      midas.style.right = '';
+      midas.style.bottom = '';
+      midas.classList.add('midas-walk');
+      setTimeout(() => midas.classList.remove('midas-walk'), 1200);
+    }
+    setInterval(midasAndar, 20000);
+    // Sentar no título
+    function midasSentar() {
+      let header = document.querySelector('.dashboard-header');
+      if (header) {
+        let rect = header.getBoundingClientRect();
+        midas.style.left = (rect.left + rect.width/2 - 40) + 'px';
+        midas.style.top = (rect.top - 60) + 'px';
+        midas.style.right = '';
+        midas.style.bottom = '';
+        midas.classList.add('midas-sit');
+        setTimeout(() => midas.classList.remove('midas-sit'), 4000);
+      }
+    }
+    setInterval(midasSentar, 60000);
+    // Capuz e notebook
+    function midasCapuzNotebook() {
+      midas.classList.add('midas-hood-on');
+      midas.classList.add('midas-notebook-on');
+      setTimeout(() => {
+        midas.classList.remove('midas-hood-on');
+        midas.classList.remove('midas-notebook-on');
+      }, 8000);
+    }
+    setInterval(midasCapuzNotebook, 45000);
+    // Clique alterna entre dançar e dormir
+    let dormindo = false;
+    midas.onclick = function() {
+      dormindo = !dormindo;
+      if (dormindo) {
+        midas.classList.add('midas-sleep');
+      } else {
+        midas.classList.remove('midas-sleep');
+      }
+    };
+    // Alternância de tema claro/escuro
+    const themeToggle = document.getElementById('themeToggle');
+    function setTheme(theme) {
+      document.body.classList.toggle('theme-light', theme === 'light');
+      themeToggle.innerText = theme === 'light' ? '☀️' : '🌙';
+      localStorage.setItem('theme', theme);
+    }
+    themeToggle.onclick = function() {
+      const isLight = !document.body.classList.contains('theme-light');
+      setTheme(isLight ? 'light' : 'dark');
+    };
+    // Carregar preferência do usuário
+    (function() {
+      const saved = localStorage.getItem('theme');
+      if (saved === 'light') setTheme('light');
+      else setTheme('dark');
+    })();
+    // Personalização dos cards do dashboard
+    const cardList = [
+      { id: 'impressoes', label: 'Impressões' },
+      { id: 'alcance', label: 'Alcance' },
+      { id: 'ctr', label: 'CTR' },
+      { id: 'cpl', label: 'CPL' },
+      { id: 'clientes', label: 'Leads/Clientes' },
+      { id: 'investimento', label: 'Investimento' },
+      { id: 'cliques', label: 'Cliques' },
+      { id: 'cpc', label: 'CPC' },
+      { id: 'resultados', label: 'Resultados' }
+    ];
+    const cardToggles = document.getElementById('cardToggles');
+    const defaultCards = cardList.map(c => c.id);
+    function getSelectedCards() {
+      const saved = localStorage.getItem('dashboard_cards');
+      if (!saved) return defaultCards;
+      try { return JSON.parse(saved); } catch { return defaultCards; }
+    }
+    function setSelectedCards(cards) {
+      localStorage.setItem('dashboard_cards', JSON.stringify(cards));
+    }
+    function renderCardToggles() {
+      const selected = getSelectedCards();
+      cardToggles.innerHTML = '';
+      cardList.forEach(card => {
+        const label = document.createElement('label');
+        label.style.display = 'flex';
+        label.style.alignItems = 'center';
+        label.style.gap = '4px';
+        const input = document.createElement('input');
+        input.type = 'checkbox';
+        input.value = card.id;
+        input.checked = selected.includes(card.id);
+        input.onchange = function() {
+          let cards = getSelectedCards();
+          if (this.checked) {
+            if (!cards.includes(card.id)) cards.push(card.id);
+          } else {
+            cards = cards.filter(c => c !== card.id);
+          }
+          setSelectedCards(cards);
+          renderMetricCards();
+        };
+        label.appendChild(input);
+        label.appendChild(document.createTextNode(card.label));
+        cardToggles.appendChild(label);
+      });
+    }
+    // Renderização dos cards de métricas conforme seleção
+    function renderMetricCards() {
+      const selected = getSelectedCards();
+      const cardsContainer = document.querySelector('.metrics-cards');
+      if (!cardsContainer) return;
+      cardsContainer.querySelectorAll('.metric-card').forEach(card => {
+        const type = card.getAttribute('data-type');
+        card.style.display = selected.includes(type) ? '' : 'none';
+      });
+    }
+    window.addEventListener('DOMContentLoaded', function() {
+      renderCardToggles();
+      renderMetricCards();
+    });
+    // Adicionar data-type nos cards de métricas (no HTML, já que é Jinja, mas aqui para JS)
+    document.querySelectorAll('.metric-card').forEach((el, i) => {
+      const types = ['impressoes','alcance','ctr','cpl','clientes','investimento','cliques','cpc','resultados'];
+      if (types[i]) el.setAttribute('data-type', types[i]);
+    });
+    // Exportação CSV/Excel
+    function exportTableToCSV(filename) {
+      const rows = document.querySelectorAll('.metrics-cards .metric-card');
+      let csv = 'Métrica,Valor\n';
+      rows.forEach(row => {
+        if (row.style.display === 'none') return;
+        const title = row.querySelector('.metric-title')?.innerText || '';
+        const value = row.querySelector('.metric-value')?.innerText || '';
+        csv += `"${title}","${value}"\n`;
+      });
+      const blob = new Blob([csv], { type: 'text/csv' });
+      const link = document.createElement('a');
+      link.href = URL.createObjectURL(blob);
+      link.download = filename;
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    }
+    document.getElementById('btnExportCSV').onclick = function() {
+      exportTableToCSV('dashboard.csv');
+    };
+    document.getElementById('btnExportExcel').onclick = function() {
+      // Excel simples: CSV com extensão .xls
+      exportTableToCSV('dashboard.xls');
+    };
+    // Exportação do gráfico como PNG
+    document.getElementById('btnExportPNG').onclick = function() {
+      const canvas = document.getElementById('graficoMetricas');
+      const link = document.createElement('a');
+      link.href = canvas.toDataURL('image/png');
+      link.download = 'grafico_dashboard.png';
+      document.body.appendChild(link);
+      link.click();
+      document.body.removeChild(link);
+    };
+    // Filtro de busca nos cards de métricas
+    document.getElementById('searchMetric').addEventListener('input', function() {
+      const termo = this.value.toLowerCase();
+      document.querySelectorAll('.metrics-cards .metric-card').forEach(card => {
+        const titulo = card.querySelector('.metric-title')?.innerText.toLowerCase() || '';
+        card.style.display = titulo.includes(termo) ? '' : 'none';
+      });
+    });
+  </script>
+</body>
+</html>

@@ -1,0 +1,191 @@
+/* ====== TEMA CLARO/ESCURO ====== */
+:root {
+  --bg-main: #111;
+  --bg-card: #181818;
+  --text-main: #FFD700;
+  --text-alt: #111;
+  --border-main: #FFD700;
+  --shadow-main: #FFD70022;
+}
+body.theme-light {
+  --bg-main: #f7f7f7;
+  --bg-card: #fff;
+  --text-main: #232526;
+  --text-alt: #FFD700;
+  --border-main: #FFD700;
+  --shadow-main: #FFD70044;
+}
+body {
+  background-color: var(--bg-main);
+  color: var(--text-main);
+  font-family: 'Segoe UI', Arial, sans-serif;
+  margin: 0;
+  padding: 20px;
+  text-align: center;
+  transition: background 0.3s, color 0.3s;
+}
+
+h1, h2, h3 {
+  color: #FFD700;
+  text-shadow: 0 0 8px #FFD70044;
+  margin-bottom: 24px;
+}
+
+input, button, select {
+  background-color: var(--bg-card);
+  color: var(--text-main);
+  border: 1px solid var(--border-main);
+  padding: 10px;
+  margin: 5px;
+  border-radius: 6px;
+  font-size: 1rem;
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s;
+}
+
+input:focus, button:focus, select:focus {
+  outline: none;
+  box-shadow: 0 0 8px var(--border-main);
+}
+
+button:hover, input[type="submit"]:hover {
+  background-color: var(--border-main);
+  color: var(--bg-main);
+  box-shadow: 0 0 12px var(--shadow-main);
+  cursor: pointer;
+}
+
+.metrics-table {
+  margin: 30px auto 0 auto;
+  border-collapse: collapse;
+  color: var(--text-main);
+  background-color: var(--bg-card);
+  min-width: 320px;
+  max-width: 600px;
+  width: 100%;
+  box-shadow: 0 0 16px var(--shadow-main);
+  border-radius: 8px;
+  overflow: hidden;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+}
+.metrics-table th, .metrics-table td {
+  border: 1px solid var(--border-main);
+  padding: 12px 8px;
+  text-align: left;
+}
+.metrics-table th {
+  background-color: #222;
+  font-weight: bold;
+}
+.metrics-table tr:nth-child(even) {
+  background-color: #191919;
+}
+
+label {
+  display: block;
+  margin-top: 18px;
+  margin-bottom: 6px;
+  font-weight: 500;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+#resultGoal, #detailedMetrics {
+  margin-top: 20px;
+  white-space: pre-wrap;
+  text-align: left;
+  max-width: 600px;
+  margin-left: auto;
+  margin-right: auto;
+}
+
+@media (max-width: 700px) {
+  body {
+    padding: 8px;
+  }
+  .metrics-table, #resultGoal, #detailedMetrics {
+    max-width: 98vw;
+    font-size: 0.95rem;
+  }
+  input, button {
+    width: 98vw;
+    max-width: 98vw;
+    box-sizing: border-box;
+  }
+}
+
+/* Responsividade global para tabelas, formulários e containers */
+@media (max-width: 500px) {
+  .metrics-table, #resultGoal, #detailedMetrics, table {
+    font-size: 0.9rem;
+    padding: 0;
+    max-width: 100vw;
+    width: 100vw;
+    overflow-x: auto;
+    display: block;
+  }
+  input, button, select {
+    width: 96vw !important;
+    max-width: 96vw !important;
+    font-size: 1em;
+  }
+  label {
+    font-size: 0.98em;
+    padding-left: 2vw;
+    padding-right: 2vw;
+  }
+  form {
+    width: 98vw !important;
+    max-width: 98vw !important;
+    padding: 0 1vw !important;
+  }
+  h1, h2, h3 {
+    font-size: 1.3em;
+  }
+}
+
+/* ====== MICROINTERAÇÕES ====== */
+button, .metric-card, .sidebar a {
+  transition: background 0.2s, color 0.2s, box-shadow 0.2s, transform 0.15s;
+}
+button:active, .sidebar a:active {
+  transform: scale(0.97);
+}
+.metric-card:hover {
+  transform: translateY(-4px) scale(1.02);
+  box-shadow: 0 0 32px var(--border-main);
+}
+
+/* ====== BOTÃO DE TEMA ====== */
+.theme-toggle {
+  position: fixed;
+  top: 16px;
+  right: 16px;
+  z-index: 9999;
+  background: var(--bg-card);
+  color: var(--text-main);
+  border: 1.5px solid var(--border-main);
+  border-radius: 50%;
+  width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-size: 1.5em;
+  cursor: pointer;
+  box-shadow: 0 0 8px var(--shadow-main);
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+}
+.theme-toggle:hover {
+  background: var(--border-main);
+  color: var(--bg-main);
+}
+
+.metrics-table, .metric-card, .suggestion-box, .config-card {
+  background-color: var(--bg-card) !important;
+  color: var(--text-main) !important;
+  border-color: var(--border-main) !important;
+  box-shadow: 0 0 16px var(--shadow-main) !important;
+  transition: background 0.3s, color 0.3s, box-shadow 0.3s;
+} 

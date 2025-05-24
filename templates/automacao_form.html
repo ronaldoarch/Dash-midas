@@ -1,0 +1,39 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <title>Formulário de Automação</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <style>
+        body {
+            background-color: #000;
+            color: #FFD700;
+            font-family: Arial, sans-serif;
+            padding: 2rem;
+        }
+        form {
+            text-align: center;
+        }
+        input, button {
+            padding: 0.5rem;
+            margin: 10px;
+            background-color: #222;
+            border: 1px solid #FFD700;
+            color: #FFD700;
+            border-radius: 4px;
+        }
+        button:hover {
+            background-color: #FFD700;
+            color: #000;
+        }
+    </style>
+</head>
+<body>
+    <h1>Formulário de Automação</h1>
+    <form method="POST">
+        <input type="text" name="action" placeholder="Ação">
+        <input type="text" name="target" placeholder="Alvo">
+        <button type="submit">Executar</button>
+    </form>
+</body>
+</html>
