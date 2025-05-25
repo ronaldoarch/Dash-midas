@@ -1174,11 +1174,6 @@ def midas_chat():
     )
     return jsonify({'resposta': resposta_padrao})
 
-# ------------------- INIT DB ------------------- #
-with app.app_context():
-    os.makedirs(os.path.join(basedir, 'instance'), exist_ok=True)
-    db.create_all()
-
 # Caminho para o arquivo de credenciais
 def get_google_creds():
     return Credentials.from_service_account_file('credentials.json', scopes=[
