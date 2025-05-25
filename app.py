@@ -1176,7 +1176,11 @@ def midas_chat():
 
 # Caminho para o arquivo de credenciais
 def get_google_creds():
-    return Credentials.from_service_account_file('credentials.json', scopes=[
+    creds_json = os.environ.get('GOOGLE_CREDS_JSON')
+    if not creds_json:
+        raise Exception("Credenciais do Google não encontradas no ambiente!")
+    info = json.loads(creds_json)
+    return Credentials.from_service_account_info(info, scopes=[
         'https://www.googleapis.com/auth/spreadsheets',
         'https://www.googleapis.com/auth/drive'
     ])
