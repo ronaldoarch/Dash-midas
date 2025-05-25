@@ -585,6 +585,8 @@ def dashboard():
 
 @app.route('/api/list-sheets')
 def list_sheets():
+    creds = get_google_creds()
+    gc = gspread.authorize(creds)
     planilhas = [
         {'id': '1w7VPPYppc-RcK_aEAIZO4103KWGM7H2FWj4V_onUIE4', 'nome': 'Planilha 1'},
         {'id': '10tUstU0pmQ5efF5B6hQStsj5MNHlwVuFzFRwFnis9LA', 'nome': 'Planilha 2'},
@@ -594,11 +596,11 @@ def list_sheets():
 
 @app.route('/api/sheets-metrics')
 def sheets_metrics():
+    creds = get_google_creds()
+    gc = gspread.authorize(creds)
     sheet_id = request.args.get('sheet_id', '1w7VPPYppc-RcK_aEAIZO4103KWGM7H2FWj4V_onUIE4')
     aba = request.args.get('aba')
     abas_flag = request.args.get('abas')
-    creds = get_google_creds()
-    gc = gspread.authorize(creds)
     spreadsheet = gc.open_by_key(sheet_id)
     if abas_flag:
         # Retorna lista de abas
@@ -633,10 +635,10 @@ def sheets_metrics():
 
 @app.route('/api/export-sheet')
 def export_sheet():
-    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
-    sheet_id = request.args.get('sheet_id')
     creds = get_google_creds()
     gc = gspread.authorize(creds)
+    locale.setlocale(locale.LC_ALL, 'pt_BR.UTF-8')
+    sheet_id = request.args.get('sheet_id')
     spreadsheet = gc.open_by_key(sheet_id)
     worksheet = spreadsheet.sheet1
     df = get_as_dataframe(worksheet, evaluate_formulas=True, header=0)
@@ -1184,8 +1186,6 @@ def get_google_creds():
         'https://www.googleapis.com/auth/spreadsheets',
         'https://www.googleapis.com/auth/drive'
     ])
-
-gc = gspread.authorize(get_google_creds())
 
 def limpar_texto_pdf(texto):
     if texto is None:
