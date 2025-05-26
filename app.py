@@ -23,10 +23,32 @@ from flask import abort
 basedir = os.path.abspath(os.path.dirname(__file__))
 
 app = Flask(__name__)
-app.secret_key = 'sua_chave_secreta_aqui'
+app.secret_key = os.environ.get('SECRET_KEY', 'chave_insegura')
 
-app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'app.db')
+# Configuração do banco de dados
+# Use DATABASE_URL para produção (ex: PostgreSQL), senão usa SQLite local
+if os.environ.get('DATABASE_URL'):
+    app.config['SQLALCHEMY_DATABASE_URI'] = os.environ['DATABASE_URL']
+else:
+    app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///' + os.path.join(basedir, 'instance', 'app.db')
 app.config['SQLALCHEMY_TRACK_MODIFICATIONS'] = False
+
+# Configuração para uploads externos (S3)
+S3_BUCKET = os.environ.get('S3_BUCKET')
+S3_KEY = os.environ.get('S3_KEY')
+S3_SECRET = os.environ.get('S3_SECRET')
+S3_REGION = os.environ.get('S3_REGION')
+
+# Se todas as variáveis S3 estiverem presentes, ativa uso de S3
+USE_S3 = all([S3_BUCKET, S3_KEY, S3_SECRET, S3_REGION])
+if USE_S3:
+    import boto3
+    s3_client = boto3.client(
+        's3',
+        aws_access_key_id=S3_KEY,
+        aws_secret_access_key=S3_SECRET,
+        region_name=S3_REGION
+    )
 
 # Inicializa DB e Login Manager
 db = SQLAlchemy(app)
@@ -1207,6 +1229,23 @@ def normalizar_nome(nome):
     nome = nome.replace('-', ' ').replace('_', ' ')
     nome = ' '.join(nome.split())
     return nome
+
+def upload_file_to_storage(file):
+    if USE_S3:
+        filename = secure_filename(file.filename)
+        s3_client.upload_fileobj(
+            file,
+            S3_BUCKET,
+            filename,
+            ExtraArgs={"ACL": "public-read"}
+        )
+        file_url = f"https://{S3_BUCKET}.s3.{S3_REGION}.amazonaws.com/{filename}"
+        return file_url
+    else:
+        # Upload local (antigo)
+        filepath = os.path.join(UPLOAD_FOLDER, secure_filename(file.filename))
+        filepath = upload_file_to_storage(file)
+        return filepath
 
 if __name__ == '__main__':
     app.run(debug=True)
